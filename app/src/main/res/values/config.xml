@@ -5,10 +5,10 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Base background of the header card. -->
-    <color name="brand_primary">#167C80</color>
+    <color name="brand_primary">#521D2C</color>
 
     <!-- Tiled pattern overlay color for the header card. -->
-    <color name="brand_pattern">#48A0A3</color>
+    <color name="brand_pattern">#FFD8E3</color>
 
     <!-- Content color on the header (text, icons, mark). Always white on teal. -->
     <color name="on_brand_surface">#FFFFFF</color>
@@ -17,5 +17,5 @@
     <color name="brand_sheen">#EADDFF</color>
 
     <!-- URL template for opening the device-specific downloads page from the update menu. -->
-    <string name="menu_downloads_url" translatable="false">https://github.com/ProjectCiRCLE-ROM/OTA</string>
+    <string name="menu_downloads_url" translatable="false">https://sourceforge.net/projects/project-circle/files/<xliff:g id="device_name">%1$s</xliff:g></string>
 </resources>

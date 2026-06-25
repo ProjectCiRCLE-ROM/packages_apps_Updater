@@ -188,6 +188,7 @@ class UpdateActionHandler(
                     Intent.ACTION_VIEW,
                     activity.getString(
                         R.string.menu_downloads_url,
+                        DeviceInfoUtils.device,
                     ).toUri(),
                 )
             )

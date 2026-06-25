@@ -248,7 +248,7 @@ fun UpdaterCard(
                         .padding(SettingsDimension.paddingLarge),
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.lineage_mark_tight),
+                        painter = painterResource(R.drawable.circle_mark),
                         contentDescription = stringResource(R.string.brand_name),
                         modifier = Modifier
                             .width(markWidth)
