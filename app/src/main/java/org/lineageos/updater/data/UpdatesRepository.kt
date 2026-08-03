@@ -14,7 +14,6 @@ import org.lineageos.updater.data.source.local.UpdatesLocalDataSource
 import org.lineageos.updater.data.source.network.UpdatesNetworkDataSource
 import org.lineageos.updater.data.source.network.toUpdate
 import org.lineageos.updater.deviceinfo.DeviceInfoUtils
-import org.lineageos.updater.misc.Utils
 import org.lineageos.updater.notifications.NotificationHelper
 import org.lineageos.updater.util.NetworkMonitor
 import java.io.IOException
@@ -41,15 +40,17 @@ class UpdatesRepository(
     suspend fun fetchUpdates(): Long? {
         if (!networkMonitor.currentNetworkState.isOnline) return null
 
-        val localUpdates = withContext(Dispatchers.IO) {
-            localDataSource.getUpdates()
-        }.associateBy { it.downloadId }
-
         val networkUpdates = withContext(Dispatchers.IO) {
             networkDataSource.fetchUpdates().map { it.toUpdate() }.filter { filterUpdates(it) }
         }
 
+        if (networkUpdates.isEmpty()) return System.currentTimeMillis()
+
         val networkIds = networkUpdates.map { it.downloadId }.toSet()
+
+        val localUpdates = withContext(Dispatchers.IO) {
+            localDataSource.getUpdates()
+        }.associateBy { it.downloadId }
 
         if (localUpdates.isNotEmpty() && networkUpdates.any { it.downloadId !in localUpdates }) {
             notificationHelper.showNewUpdatesNotification()
@@ -70,7 +71,8 @@ class UpdatesRepository(
 
             // Delete temp files and DB entries for updates no longer advertised by the server.
             localUpdates.values.filter {
-                it.downloadId !in networkIds && it.downloadId != Update.LOCAL_ID
+                it.downloadId !in networkIds && it.downloadId != Update.LOCAL_ID &&
+                        it.downloadUrl != null
             }.forEach {
                 it.file?.delete()
                 localDataSource.removeUpdate(it.downloadId)
@@ -89,12 +91,7 @@ class UpdatesRepository(
             return false
         }
 
-        if (!Utils.compareVersions(
-                update.version,
-                DeviceInfoUtils.buildVersion,
-                DeviceInfoUtils.isMajorUpdateAllowed,
-            )
-        ) {
+        if (update.osSdkLevel < DeviceInfoUtils.sdkLevel) {
             Log.d(TAG, "${update.name} is older than current Android version")
             return false
         }
